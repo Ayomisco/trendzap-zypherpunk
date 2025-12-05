@@ -1,0 +1,20 @@
+[package]
+name = "trendzap-bet"
+version = "0.1.0"
+description = "TrendZap cross-chain bet acceptance program"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "trendzap_bet"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.29.0"
+anchor-spl = "0.29.0"
