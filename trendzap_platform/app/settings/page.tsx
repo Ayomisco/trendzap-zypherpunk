@@ -1,0 +1,214 @@
+"use client"
+
+import { Navigation } from "@/components/navigation"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Bell, Lock, Eye, Wallet, LogOut, Shield } from "lucide-react"
+
+export default function SettingsPage() {
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navigation />
+
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-6">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Settings</h1>
+            <p className="text-muted-foreground">Manage your account preferences and security</p>
+          </div>
+
+          {/* Settings Tabs */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Desktop Sidebar Navigation */}
+            <div className="hidden lg:block">
+              <div className="space-y-2 sticky top-24">
+                <Button variant="ghost" className="w-full justify-start gap-3 h-10">
+                  <Shield className="h-4 w-4" />
+                  Account
+                </Button>
+                <Button variant="ghost" className="w-full justify-start gap-3 h-10">
+                  <Lock className="h-4 w-4" />
+                  Security
+                </Button>
+                <Button variant="ghost" className="w-full justify-start gap-3 h-10">
+                  <Bell className="h-4 w-4" />
+                  Notifications
+                </Button>
+                <Button variant="ghost" className="w-full justify-start gap-3 h-10">
+                  <Wallet className="h-4 w-4" />
+                  Wallet
+                </Button>
+              </div>
+            </div>
+
+            {/* Settings Content */}
+            <div className="lg:col-span-3">
+              {/* Mobile: Tabs */}
+              <Tabs defaultValue="account" className="lg:hidden">
+                <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsTrigger value="account">Account</TabsTrigger>
+                  <TabsTrigger value="security">Security</TabsTrigger>
+                  <TabsTrigger value="notifications">Alerts</TabsTrigger>
+                  <TabsTrigger value="wallet">Wallet</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="account" className="space-y-6">
+                  <AccountSettings />
+                </TabsContent>
+                <TabsContent value="security" className="space-y-6">
+                  <SecuritySettings />
+                </TabsContent>
+                <TabsContent value="notifications" className="space-y-6">
+                  <NotificationSettings />
+                </TabsContent>
+                <TabsContent value="wallet" className="space-y-6">
+                  <WalletSettings />
+                </TabsContent>
+              </Tabs>
+
+              {/* Desktop: Show all sections */}
+              <div className="hidden lg:space-y-6 lg:block">
+                <AccountSettings />
+                <SecuritySettings />
+                <NotificationSettings />
+                <WalletSettings />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function AccountSettings() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+        <Shield className="h-5 w-5 text-primary" />
+        Account Settings
+      </h2>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Username</label>
+          <Input defaultValue="@cryptowhale" className="bg-card" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Email</label>
+          <Input defaultValue="whale@example.com" className="bg-card" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Display Name</label>
+          <Input defaultValue="Crypto Whale" className="bg-card" />
+        </div>
+        <div className="flex gap-2 pt-4">
+          <Button className="bg-primary hover:bg-primary/90">Save Changes</Button>
+          <Button variant="outline" className="bg-transparent">
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function SecuritySettings() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+        <Lock className="h-5 w-5 text-primary" />
+        Security
+      </h2>
+      <div className="space-y-4">
+        <Button variant="outline" className="w-full justify-start h-12 gap-3 bg-transparent">
+          <Shield className="h-4 w-4" />
+          Enable Two-Factor Authentication
+        </Button>
+        <Button variant="outline" className="w-full justify-start h-12 gap-3 bg-transparent">
+          <Eye className="h-4 w-4" />
+          Change Password
+        </Button>
+        <div className="pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground mb-4">Active Sessions</p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between p-3 bg-card rounded-lg">
+              <div>
+                <p className="font-medium text-sm">Chrome on macOS</p>
+                <p className="text-xs text-muted-foreground">Last active now</p>
+              </div>
+              <Badge>Current</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function NotificationSettings() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+        <Bell className="h-5 w-5 text-primary" />
+        Notifications
+      </h2>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-3 hover:bg-card/50 rounded-lg transition-colors">
+          <div>
+            <p className="font-medium text-sm">Market Resolved</p>
+            <p className="text-xs text-muted-foreground">Get notified when your markets resolve</p>
+          </div>
+          <input type="checkbox" defaultChecked className="w-5 h-5" />
+        </div>
+        <div className="flex items-center justify-between p-3 hover:bg-card/50 rounded-lg transition-colors">
+          <div>
+            <p className="font-medium text-sm">Liquidity Updates</p>
+            <p className="text-xs text-muted-foreground">Notify on significant pool changes</p>
+          </div>
+          <input type="checkbox" defaultChecked className="w-5 h-5" />
+        </div>
+        <div className="flex items-center justify-between p-3 hover:bg-card/50 rounded-lg transition-colors">
+          <div>
+            <p className="font-medium text-sm">Trending Markets</p>
+            <p className="text-xs text-muted-foreground">Daily digest of trending predictions</p>
+          </div>
+          <input type="checkbox" className="w-5 h-5" />
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function WalletSettings() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+        <Wallet className="h-5 w-5 text-primary" />
+        Wallet Management
+      </h2>
+      <div className="space-y-4">
+        <div className="p-4 bg-card border border-border rounded-lg">
+          <p className="text-sm font-medium mb-2">Connected Wallet</p>
+          <p className="font-mono text-lg mb-4">0x742d35Cc6634C0532925a3b844Bc9e7595C9A</p>
+          <div className="flex gap-2">
+            <Button size="sm" className="bg-primary hover:bg-primary/90">
+              View on Chain
+            </Button>
+            <Button size="sm" variant="outline" className="bg-transparent gap-2">
+              <LogOut className="h-4 w-4" />
+              Disconnect
+            </Button>
+          </div>
+        </div>
+        <Button variant="outline" className="w-full bg-transparent gap-2">
+          <Wallet className="h-4 w-4" />
+          Connect Additional Wallet
+        </Button>
+      </div>
+    </Card>
+  )
+}

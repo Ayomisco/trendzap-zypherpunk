@@ -1,0 +1,10 @@
+
+node_modules/
+dist/
+.env
+.vercel
+.next/
+.DS_Store
+coverage/
+.idea/
+.vscode/

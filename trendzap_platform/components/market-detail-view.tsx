@@ -1,0 +1,360 @@
+"use client"
+
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Users,
+  DollarSign,
+  Share2,
+  ExternalLink,
+  Activity,
+  BarChart3,
+  Zap,
+} from "lucide-react"
+
+interface MarketDetailViewProps {
+  marketId: string
+}
+
+export function MarketDetailView({ marketId }: MarketDetailViewProps) {
+  const [betAmount, setBetAmount] = useState("")
+  const [selectedPosition, setSelectedPosition] = useState<"over" | "under" | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  // Mock data
+  const market = {
+    platform: "tiktok",
+    thumbnail: "/viral-dance-tiktok.jpg",
+    title: "Epic dance trend taking over FYP - Will it hit 10M views?",
+    metric: "Views",
+    threshold: 10000000,
+    currentValue: 4235000,
+    overPool: 12500,
+    underPool: 8300,
+    totalBets: 234,
+    endsIn: "18h 32m",
+    endsAt: new Date(Date.now() + 18 * 60 * 60 * 1000),
+    creator: "trendmaster",
+    sourceUrl: "https://tiktok.com/@user/video/123",
+  }
+
+  const totalPool = market.overPool + market.underPool
+  const overPercentage = (market.overPool / totalPool) * 100
+  const underPercentage = (market.underPool / totalPool) * 100
+
+  const calculatePayout = () => {
+    if (!betAmount || !selectedPosition) return 0
+    const amount = Number.parseFloat(betAmount)
+    if (selectedPosition === "over") {
+      return amount * (totalPool / market.overPool) * 0.97 // 3% fee
+    } else {
+      return amount * (totalPool / market.underPool) * 0.97
+    }
+  }
+
+  const placeBet = () => {
+    setShowSuccess(true)
+    setTimeout(() => setShowSuccess(false), 3000)
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Content Preview */}
+      <Card className="overflow-hidden">
+        <div className="relative h-96">
+          <img src={market.thumbnail || "/placeholder.svg"} alt={market.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+
+          <Badge className="absolute top-4 left-4 bg-gradient-to-r from-[#FF0050] to-[#00F2EA] text-white border-0 font-semibold">
+            {market.platform.toUpperCase()}
+          </Badge>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute top-4 right-4 gap-2 bg-background/80 backdrop-blur-sm"
+            asChild
+          >
+            <a href={market.sourceUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              {"View Original"}
+            </a>
+          </Button>
+
+          <div className="absolute bottom-6 left-6 right-6">
+            <h1 className="text-2xl font-bold mb-3 text-foreground drop-shadow-lg">{market.title}</h1>
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1 text-foreground">
+                <Clock className="h-4 w-4 text-accent" />
+                <span className="font-mono drop-shadow">{market.endsIn}</span>
+              </div>
+              <div className="flex items-center gap-1 text-foreground">
+                <Users className="h-4 w-4 text-secondary" />
+                <span className="drop-shadow">{market.totalBets} bets</span>
+              </div>
+              <div className="flex items-center gap-1 text-foreground">
+                <DollarSign className="h-4 w-4 text-primary" />
+                <span className="font-mono drop-shadow">${totalPool.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Market Stats & Betting */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Stats Card */}
+        <Card className="p-6 space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">{"Market Question"}</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">{"Metric"}</span>
+                <span className="font-semibold">{market.metric}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">{"Current Value"}</span>
+                <span className="font-mono font-bold text-lg">{market.currentValue.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">{"Threshold"}</span>
+                <span className="font-mono font-bold text-lg text-primary">{market.threshold.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center pt-3 border-t border-border">
+                <span className="text-muted-foreground">{"Progress"}</span>
+                <span className="font-semibold">{((market.currentValue / market.threshold) * 100).toFixed(1)}%</span>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mt-4 h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
+                style={{ width: `${Math.min((market.currentValue / market.threshold) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-4">{"Pool Distribution"}</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-primary font-semibold flex items-center gap-1">
+                    <TrendingUp className="h-4 w-4" />
+                    {"Over"}
+                  </span>
+                  <span className="font-mono">${market.overPool.toLocaleString()}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-500"
+                    style={{ width: `${overPercentage}%` }}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">{overPercentage.toFixed(1)}%</div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-destructive font-semibold flex items-center gap-1">
+                    <TrendingDown className="h-4 w-4" />
+                    {"Under"}
+                  </span>
+                  <span className="font-mono">${market.underPool.toLocaleString()}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-destructive transition-all duration-500"
+                    style={{ width: `${underPercentage}%` }}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">{underPercentage.toFixed(1)}%</div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Betting Card */}
+        <Card className="p-6 space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">{"Place Your Bet"}</h3>
+
+            {showSuccess && (
+              <div className="mb-4 p-4 bg-primary/10 border border-primary/20 rounded-lg animate-slide-up">
+                <div className="flex items-center gap-2 text-primary">
+                  <Zap className="h-5 w-5 fill-primary" />
+                  <span className="font-semibold">{"Bet placed successfully!"}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Position Selection */}
+            <div className="space-y-3 mb-6">
+              <Label>{"Select Position"}</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setSelectedPosition("over")}
+                  className={`group relative p-4 rounded-lg border-2 transition-all ${
+                    selectedPosition === "over"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50 hover:bg-primary/5"
+                  }`}
+                >
+                  <div className="text-center space-y-2">
+                    <TrendingUp
+                      className={`h-8 w-8 mx-auto transition-colors ${
+                        selectedPosition === "over" ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    />
+                    <div className="font-bold">{"Over"}</div>
+                    <div className="text-xs text-muted-foreground">{overPercentage.toFixed(0)}% pool</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedPosition("under")}
+                  className={`group relative p-4 rounded-lg border-2 transition-all ${
+                    selectedPosition === "under"
+                      ? "border-destructive bg-destructive/10"
+                      : "border-border hover:border-destructive/50 hover:bg-destructive/5"
+                  }`}
+                >
+                  <div className="text-center space-y-2">
+                    <TrendingDown
+                      className={`h-8 w-8 mx-auto transition-colors ${
+                        selectedPosition === "under" ? "text-destructive" : "text-muted-foreground"
+                      }`}
+                    />
+                    <div className="font-bold">{"Under"}</div>
+                    <div className="text-xs text-muted-foreground">{underPercentage.toFixed(0)}% pool</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Amount Input */}
+            <div className="space-y-3">
+              <Label htmlFor="bet-amount">{"Bet Amount (USDC)"}</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="bet-amount"
+                  type="number"
+                  placeholder="100"
+                  value={betAmount}
+                  onChange={(e) => setBetAmount(e.target.value)}
+                  className="pl-10 text-lg font-mono h-12"
+                />
+              </div>
+              <div className="flex gap-2">
+                {[10, 50, 100, 500].map((amount) => (
+                  <Button
+                    key={amount}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    onClick={() => setBetAmount(amount.toString())}
+                  >
+                    ${amount}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Payout Calculation */}
+            {betAmount && selectedPosition && (
+              <div className="p-4 bg-muted/50 rounded-lg space-y-2 border border-border animate-slide-up">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{"Your bet"}</span>
+                  <span className="font-mono font-semibold">${betAmount} USDC</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{"Position"}</span>
+                  <span
+                    className={`font-semibold ${selectedPosition === "over" ? "text-primary" : "text-destructive"}`}
+                  >
+                    {selectedPosition === "over" ? "Over" : "Under"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{"Potential payout"}</span>
+                  <span className="font-mono font-semibold text-primary">${calculatePayout().toFixed(2)} USDC</span>
+                </div>
+                <div className="flex justify-between text-sm pt-2 border-t border-border">
+                  <span className="text-muted-foreground">{"Platform fee (3%)"}</span>
+                  <span className="font-mono text-xs">${(Number.parseFloat(betAmount) * 0.03).toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
+            <Button
+              className="w-full gap-2 h-12 text-base font-semibold"
+              size="lg"
+              disabled={!betAmount || !selectedPosition}
+              onClick={placeBet}
+            >
+              <Zap className="h-5 w-5 fill-current" />
+              {"Zap It!"}
+            </Button>
+
+            <Button variant="ghost" className="w-full gap-2" size="sm">
+              <Share2 className="h-4 w-4" />
+              {"Share Market"}
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      {/* Activity Tabs */}
+      <Card className="p-6">
+        <Tabs defaultValue="activity">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="activity" className="gap-2">
+              <Activity className="h-4 w-4" />
+              {"Activity"}
+            </TabsTrigger>
+            <TabsTrigger value="chart" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              {"Chart"}
+            </TabsTrigger>
+            <TabsTrigger value="info" className="gap-2">
+              <Users className="h-4 w-4" />
+              {"Info"}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="activity" className="mt-6">
+            <div className="text-center text-muted-foreground py-8">{"Live activity feed coming soon"}</div>
+          </TabsContent>
+          <TabsContent value="chart" className="mt-6">
+            <div className="text-center text-muted-foreground py-8">{"Real-time chart coming soon"}</div>
+          </TabsContent>
+          <TabsContent value="info" className="mt-6">
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{"Market Creator"}</span>
+                <span className="font-semibold">@{market.creator}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{"Created"}</span>
+                <span>{"2 hours ago"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{"Resolution"}</span>
+                <span>{market.endsAt.toLocaleString()}</span>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </div>
+  )
+}
